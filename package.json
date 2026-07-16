@@ -1,0 +1,13 @@
+{
+  "name": "tsa-backend",
+  "version": "1.0.0",
+  "description": "Tech Sales Accelerator - payments, auth, entitlements",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup:stripe": "node stripe-setup.js"
+  },
+  "dependencies": {
+    "stripe": "^17.0.0"
+  }
+}
