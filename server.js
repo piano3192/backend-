@@ -93,24 +93,24 @@ const RESEND_KEY = process.env.RESEND_KEY || "";
 const EMAIL_FROM = process.env.EMAIL_FROM || "onboarding@resend.dev";
 async function sendEmail(to, subject, body) {
   if (!RESEND_KEY) {
-    console.log("EMAIL (no key) to " + to + ": " + subject);
+    console.log(`\n=== EMAIL (no RESEND_KEY, logging only) to ${to} ===\n${subject}\n${body}\n===================\n`);
     return;
   }
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: "Bearer " + RESEND_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: EMAIL_FROM, to: to, subject: subject, text: body }),
+      headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: EMAIL_FROM, to, subject, text: body }),
     });
-    if (!r.ok) { const t = await r.text(); console.error("Resend error " + r.status + ": " + t); }
-    else { console.log("email sent to " + to); }
-  } catch (e) { console.error("email send failed: " + e.message); }
-}
-  // Example with Resend:
-  //   await fetch("https://api.resend.com/emails", { method:"POST",
-  //     headers:{ Authorization:`Bearer ${process.env.RESEND_KEY}`, "Content-Type":"application/json" },
-  //     body: JSON.stringify({ from:"Tech Sales Accelerator <hello@yourdomain.com>", to, subject, text: body }) });
-  console.log(`\n=== EMAIL to ${to} ===\n${subject}\n${body}\n===================\n`);
+    if (!r.ok) {
+      const t = await r.text();
+      console.error(`Resend error ${r.status}: ${t}`);
+    } else {
+      console.log(`email sent to ${to}`);
+    }
+  } catch (e) {
+    console.error("email send failed:", e.message);
+  }
 }
 
 /* ---------------- request helpers ---------------- */
