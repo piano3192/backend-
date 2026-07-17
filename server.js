@@ -88,8 +88,24 @@ function verify(token) {
   return obj;
 }
 
-/* ---------------- email (TODO: plug in Resend/Postmark; logs for local dev) ---------------- */
+/* ---------------- email via Resend ---------------- */
+const RESEND_KEY = process.env.RESEND_KEY || "";
+const EMAIL_FROM = process.env.EMAIL_FROM || "onboarding@resend.dev";
 async function sendEmail(to, subject, body) {
+  if (!RESEND_KEY) {
+    console.log("EMAIL (no key) to " + to + ": " + subject);
+    return;
+  }
+  try {
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + RESEND_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: EMAIL_FROM, to: to, subject: subject, text: body }),
+    });
+    if (!r.ok) { const t = await r.text(); console.error("Resend error " + r.status + ": " + t); }
+    else { console.log("email sent to " + to); }
+  } catch (e) { console.error("email send failed: " + e.message); }
+}
   // Example with Resend:
   //   await fetch("https://api.resend.com/emails", { method:"POST",
   //     headers:{ Authorization:`Bearer ${process.env.RESEND_KEY}`, "Content-Type":"application/json" },
